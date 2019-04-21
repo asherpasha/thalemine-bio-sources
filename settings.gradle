@@ -1,0 +1,3 @@
+rootProject.name = 'bio-sources'
+include ':bio-source-bar-ncbi-fasta'
+project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-ncbi-fasta')
