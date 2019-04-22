@@ -20,9 +20,9 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  * This is inspired from: https://github.com/intermine/intermine/blob/dev/bio/sources/fasta/src/main/java/org/intermine/bio/dataconversion/NCBIFastaLoaderTask.java
  * @author Asher
  */
-public class BarNcbiFastaConverter extends FastaLoaderTask
+public class BarNcbiFastaLoaderTask extends FastaLoaderTask
 {
-    protected static final Logger LOG = Logger.getLogger(BarNcbiFastaConverter.class);
+    protected static final Logger LOG = Logger.getLogger(BarNcbiFastaLoaderTask.class);
 
     /**
      * {@inheritDoc}
