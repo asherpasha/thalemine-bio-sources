@@ -36,6 +36,7 @@ public class BarNcbiGffGFF3RecordHandler extends GFF3RecordHandler
         refsAndCollections.put("Exon", "transcripts");
         refsAndCollections.put("Transcript", "gene");
         refsAndCollections.put("MRNA", "gene");
+        //refsAndCollections.put("CDS", "gene");
     }
 
     /**
@@ -107,9 +108,13 @@ public class BarNcbiGffGFF3RecordHandler extends GFF3RecordHandler
                 feature.setClassName("Transcript");
             }
 	    
-	    // This sets transcipt id. We could use AGI ID, but let's see how it ges
-            String identifier = record.getAttributes().get("transcript_id").iterator().next();
-            feature.setAttribute("primaryIdentifier", identifier);
+	    // This sets transcipt id.
+            for (String identifier : record.getDbxrefs()) {
+                if (identifier.contains("Araport")) {
+                    String[] bits = identifier.split(":");
+                    feature.setAttribute("primaryIdentifier", bits[1]);
+                }
+            }
 
 	    // This set product
             if (record.getAttributes().get("product") != null) {
@@ -125,7 +130,33 @@ public class BarNcbiGffGFF3RecordHandler extends GFF3RecordHandler
 	    for (String identifier : record.getDbxrefs()) {
                 if (identifier.contains("Araport")) {
                     String[] bits = identifier.split(":");
+                    feature.setAttribute("primaryIdentifier", bits[1] + ":exon:" + Character.toString(exonNumber));
+                }
+            }
+            
+	    // Product is like description
+            if (record.getAttributes().get("product") != null) {
+                String description = record.getAttributes().get("product").iterator().next();
+                feature.setAttribute("name", description);
+            }
+        } else if ("CDS".equals(type)) {
+            feature.setClassName("CDS");
+	    /*
+            String exonID = record.getAttributes().get("ID").iterator().next();
+            char exonNumber = exonID.charAt(exonID.length() - 1);
+            
+	    for (String identifier : record.getDbxrefs()) {
+                if (identifier.contains("Araport")) {
+                    String[] bits = identifier.split(":");
                     feature.setAttribute("primaryIdentifier", bits[1] + "." + Character.toString(exonNumber));
+                }
+            }
+	    */
+	    
+	    for (String identifier : record.getDbxrefs()) {
+                if (identifier.contains("Araport")) {
+                    String[] bits = identifier.split(":");
+                    feature.setAttribute("primaryIdentifier", bits[1]);
                 }
             }
             
