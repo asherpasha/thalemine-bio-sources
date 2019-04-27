@@ -94,12 +94,6 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler
 	    // Get this number from ID=exon-NM_099983.2-1;
             String exonID = record.getAttributes().get("ID").iterator().next();
             feature.setAttribute("primaryIdentifier", exonID);
-        } else {
-
-	    // Drop everything else
-	    removeFeature();
-	    return;
-	}
-
+        } 
     }
 }
