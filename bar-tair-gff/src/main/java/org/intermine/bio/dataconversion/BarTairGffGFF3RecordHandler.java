@@ -18,30 +18,30 @@ import org.intermine.xml.full.Item;
  * A converter/retriever for the BarTairGff dataset via GFF files.
  */
 
-public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler
-{
+public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
 
     /**
      * Create a new BarTairGffGFF3RecordHandler for the given data model.
+     *
      * @param model the model for which items will be created
      */
-    public BarTairGffGFF3RecordHandler (Model model) {
+    public BarTairGffGFF3RecordHandler(Model model) {
         super(model);
         refsAndCollections.put("Exon", "transcripts");
         refsAndCollections.put("Transcript", "gene");
-	refsAndCollections.put("LncRNA", "gene");
+        refsAndCollections.put("LncRNA", "gene");
         refsAndCollections.put("MRNA", "gene");
-	refsAndCollections.put("TransposonFragment", "transposableElement");
+        refsAndCollections.put("TransposonFragment", "transposableElement");
         refsAndCollections.put("AntisenseRNA", "gene");
         refsAndCollections.put("AntisenseLncRNA", "gene");
         refsAndCollections.put("MiRNAPrimaryTranscript", "gene");
         refsAndCollections.put("NcRNA", "gene");
         refsAndCollections.put("TRNA", "gene");
-	refsAndCollections.put("TranscriptRegion", "gene");
-        refsAndCollections.put("PseudogenicTranscript","pseudogene");
-        refsAndCollections.put("PseudogenicExon","pseudogenicTranscripts");
-        refsAndCollections.put("PseudogenicTRNA","pseudogene");
-	refsAndCollections.put("UORF", "gene");
+        refsAndCollections.put("TranscriptRegion", "gene");
+        refsAndCollections.put("PseudogenicTranscript", "pseudogene");
+        refsAndCollections.put("PseudogenicExon", "pseudogenicTranscripts");
+        refsAndCollections.put("PseudogenicTRNA", "pseudogene");
+        refsAndCollections.put("UORF", "gene");
     }
 
     /**
@@ -55,21 +55,24 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler
         // the key.
         Item feature = getFeature();
         String clsName = feature.getClassName();
-	String type = record.getType();
-	if ("gene".equals(type)) {
-	    // Set Araport/TAIR gene id
+        String type = record.getType();
+
+        // The type column in GFF3
+        if ("gene".equals(type)) {
+            // Set Araport/TAIR gene id
             feature.setClassName("Gene");
 
+            // This might not be needed.
             String geneID = record.getAttributes().get("ID").iterator().next();
             feature.setAttribute("primaryIdentifier", geneID);
 
-	    // This is gene alias
-	    if (record.getAttributes().get("symbol") != null) {
+            // This is gene alias
+            if (record.getAttributes().get("symbol") != null) {
                 String symbol = record.getAttributes().get("symbol").iterator().next();
-	        feature.setAttribute("symbol", symbol);
-	    }
+                feature.setAttribute("symbol", symbol);
+            }
 
-	    // I dount we have description, but ...
+            // Use computational description as brief description
             if (record.getAttributes().get("computational_description") != null) {
                 String description = record.getAttributes().get("computational_description").iterator().next();
                 feature.setAttribute("briefDescription", description);
@@ -80,20 +83,21 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler
             } else {
                 feature.setClassName("Transcript");
             }
-            
-	    String mRNAID = record.getAttributes().get("ID").iterator().next();
+
+            // Set mRNA ID
+            String mRNAID = record.getAttributes().get("ID").iterator().next();
             feature.setAttribute("primaryIdentifier", mRNAID);
-	    
-	    // This set product
+
+            // Use parent as name
             if (record.getAttributes().get("Parent") != null) {
                 String description = record.getAttributes().get("Parent").iterator().next();
                 feature.setAttribute("name", description);
             }
         } else if ("exon".equals(type)) {
             feature.setClassName("Exon");
-	    // Get this number from ID=exon-NM_099983.2-1;
+            // Again, This might not be needed
             String exonID = record.getAttributes().get("ID").iterator().next();
             feature.setAttribute("primaryIdentifier", exonID);
-        } 
+        }
     }
 }
