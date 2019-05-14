@@ -10,8 +10,16 @@ package org.intermine.bio.dataconversion;
  *
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.intermine.bio.io.gff3.GFF3Record;
 import org.intermine.metadata.Model;
+import org.intermine.metadata.StringUtil;
 import org.intermine.xml.full.Item;
 
 /**
@@ -19,6 +27,9 @@ import org.intermine.xml.full.Item;
  */
 
 public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
+
+    private final Map<String, Item> pubmedIdMap = new HashMap<String, Item>();
+    private final Map<String, Item> protIdMap = new HashMap<String, Item>(); // This will store Uniprot IDs
 
     /**
      * Create a new BarTairGffGFF3RecordHandler for the given data model.
@@ -28,6 +39,7 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
     public BarTairGffGFF3RecordHandler(Model model) {
         super(model);
         refsAndCollections.put("Exon", "transcripts");
+        refsAndCollections.put("CDS", "transcripts");
         refsAndCollections.put("Transcript", "gene");
         refsAndCollections.put("LncRNA", "gene");
         refsAndCollections.put("MRNA", "gene");
@@ -58,46 +70,113 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
         String type = record.getType();
 
         // The type column in GFF3
-        if ("gene".equals(type)) {
-            // Set Araport/TAIR gene id
-            feature.setClassName("Gene");
+        switch (type) {
+            case "gene":
+                // Set Araport/TAIR gene id
+                feature.setClassName("Gene");
 
-            // This might not be needed.
-            String geneID = record.getAttributes().get("ID").iterator().next();
-            feature.setAttribute("primaryIdentifier", geneID);
+                // This might not be needed.
+                String geneID = record.getAttributes().get("ID").iterator().next();
+                feature.setAttribute("primaryIdentifier", geneID);
 
-            // This is gene alias
-            if (record.getAttributes().get("symbol") != null) {
-                String symbol = record.getAttributes().get("symbol").iterator().next();
-                feature.setAttribute("symbol", symbol);
-            }
+                // This is gene alias
+                if (record.getAttributes().get("symbol") != null) {
+                    String symbol = record.getAttributes().get("symbol").iterator().next();
+                    feature.setAttribute("symbol", symbol);
+                }
 
-            // Use computational description as brief description
-            if (record.getAttributes().get("computational_description") != null) {
-                String description = record.getAttributes().get("computational_description").iterator().next();
-                feature.setAttribute("briefDescription", description);
-            }
-        } else if ("transcript".equals(type) || "MRNA".equalsIgnoreCase(type)) {
-            if ("MRNA".equalsIgnoreCase(type)) {
-                feature.setClassName("MRNA");
-            } else {
-                feature.setClassName("Transcript");
-            }
+                // Use computational description as brief description
+                if (record.getAttributes().get("computational_description") != null) {
+                    String description = record.getAttributes().get("computational_description").iterator().next();
+                    feature.setAttribute("briefDescription", description);
+                }
+                break;
+            case "transcript":
+            case "MRNA":
+            case "mRNA":
+                if ("MRNA".equalsIgnoreCase(type)) {
+                    feature.setClassName("MRNA");
+                } else {
+                    feature.setClassName("Transcript");
+                }
 
-            // Set mRNA ID
-            String mRNAID = record.getAttributes().get("ID").iterator().next();
-            feature.setAttribute("primaryIdentifier", mRNAID);
+                // Set ID
+                String dataID = record.getAttributes().get("ID").iterator().next();
+                feature.setAttribute("primaryIdentifier", dataID);
 
-            // Use parent as name
-            if (record.getAttributes().get("Parent") != null) {
-                String description = record.getAttributes().get("Parent").iterator().next();
-                feature.setAttribute("name", description);
-            }
-        } else if ("exon".equals(type)) {
-            feature.setClassName("Exon");
-            // Again, This might not be needed
-            String exonID = record.getAttributes().get("ID").iterator().next();
-            feature.setAttribute("primaryIdentifier", exonID);
+                // Use parent as name
+                if (record.getAttributes().get("Parent") != null) {
+                    String description = record.getAttributes().get("Parent").iterator().next();
+                    feature.setAttribute("name", description);
+                }
+
+                // The code below is from Vivek!
+                // The Protein thing did not work!
+                List<String> dbxrefs = record.getDbxrefs();
+                if (dbxrefs != null) {
+                    Iterator<String> dbxrefsIter = dbxrefs.iterator();
+
+                    while (dbxrefsIter.hasNext()) {
+                        String dbxref = dbxrefsIter.next();
+
+                        List<String> refList = new ArrayList<String>(
+                                Arrays.asList(StringUtil.split(dbxref, ",")));
+                        for (String ref : refList) {
+                            ref = ref.trim();
+                            int colonIndex = ref.indexOf(":");
+                            if (colonIndex == -1) {
+                                throw new RuntimeException("external reference not understood: " + ref);
+                            }
+
+                            if (ref.startsWith("gene:") || ref.startsWith("locus:")) {
+                                feature.setAttribute("secondaryIdentifier", ref);
+                            } else if (ref.startsWith("PMID:")) {
+                                String pmid = ref.substring(colonIndex + 1);
+                                Item pubmedItem;
+                                if (pubmedIdMap.containsKey(pmid)) {
+                                    pubmedItem = pubmedIdMap.get(pmid);
+                                } else {
+                                    pubmedItem = converter.createItem("Publication");
+                                    pubmedIdMap.put(pmid, pubmedItem);
+                                    pubmedItem.setAttribute("pubMedId", pmid);
+                                    addItem(pubmedItem);
+                                }
+                                addPublication(pubmedItem);
+                            } else if (ref.startsWith("UniProt:")) {
+                                String uniprotAcc = ref.substring(colonIndex + 1);
+
+                                Item proteinItem;
+                                if (protIdMap.containsKey(uniprotAcc)) {
+                                    proteinItem = protIdMap.get(uniprotAcc);
+                                } else {
+                                    proteinItem = converter.createItem("Protein");
+                                    proteinItem.setAttribute("primaryAccession", uniprotAcc);
+                                    proteinItem.setReference("organism", getOrganism());
+                                    addItem(proteinItem);
+
+                                    protIdMap.put(uniprotAcc, proteinItem);
+                                }
+                                feature.setReference("protein", proteinItem);
+                            } else {
+                                throw new RuntimeException("unknown external reference type: " + ref);
+                            }
+                        }
+                    }
+                }
+
+                break;
+            case "exon":
+            case "CDS":
+                if ("exon".equalsIgnoreCase(type)) {
+                    feature.setClassName("Exon");
+                } else {
+                    feature.setClassName("CDS");
+                }
+
+                // Again, This might not be needed
+                String exonID = record.getAttributes().get("ID").iterator().next();
+                feature.setAttribute("primaryIdentifier", exonID);
+                break;
         }
     }
 }

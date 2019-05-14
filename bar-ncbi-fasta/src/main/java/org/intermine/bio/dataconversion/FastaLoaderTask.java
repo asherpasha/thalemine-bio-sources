@@ -226,7 +226,7 @@ public class FastaLoaderTask extends FileDirectDataLoaderTask
     @Override
     public void processFile(File file) {
         try {
-            System.err .println("reading " + sequenceType + " sequence from: " + file);
+            System.err.println("reading " + sequenceType + " sequence from: " + file);
             LOG.debug("FastaLoaderTask loading file " + file.getName());
             if ("dna".equalsIgnoreCase(sequenceType)) {
                 FastaReader<DNASequence, NucleotideCompound> aFastaReader
