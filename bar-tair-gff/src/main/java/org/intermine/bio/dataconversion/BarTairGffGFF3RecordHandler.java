@@ -10,12 +10,6 @@ package org.intermine.bio.dataconversion;
  *
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.intermine.bio.io.gff3.GFF3Record;
 import org.intermine.metadata.Model;
@@ -27,10 +21,6 @@ import org.intermine.xml.full.Item;
  */
 
 public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
-
-    private final Map<String, Item> pubmedIdMap = new HashMap<String, Item>();
-    private final Map<String, Item> protIdMap = new HashMap<String, Item>(); // This will store Uniprot IDs
-
     /**
      * Create a new BarTairGffGFF3RecordHandler for the given data model.
      *
@@ -105,65 +95,16 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler {
                 feature.setAttribute("primaryIdentifier", dataID);
 
                 // Use parent as name
-                if (record.getAttributes().get("Parent") != null) {
-                    String description = record.getAttributes().get("Parent").iterator().next();
+                if (record.getAttributes().get("Name") != null) {
+                    String description = record.getAttributes().get("Name").iterator().next();
                     feature.setAttribute("name", description);
                 }
 
-                // The code below is from Vivek!
-                // The Protein thing did not work!
-                List<String> dbxrefs = record.getDbxrefs();
-                if (dbxrefs != null) {
-                    Iterator<String> dbxrefsIter = dbxrefs.iterator();
-
-                    while (dbxrefsIter.hasNext()) {
-                        String dbxref = dbxrefsIter.next();
-
-                        List<String> refList = new ArrayList<String>(
-                                Arrays.asList(StringUtil.split(dbxref, ",")));
-                        for (String ref : refList) {
-                            ref = ref.trim();
-                            int colonIndex = ref.indexOf(":");
-                            if (colonIndex == -1) {
-                                throw new RuntimeException("external reference not understood: " + ref);
-                            }
-
-                            if (ref.startsWith("gene:") || ref.startsWith("locus:")) {
-                                feature.setAttribute("secondaryIdentifier", ref);
-                            } else if (ref.startsWith("PMID:")) {
-                                String pmid = ref.substring(colonIndex + 1);
-                                Item pubmedItem;
-                                if (pubmedIdMap.containsKey(pmid)) {
-                                    pubmedItem = pubmedIdMap.get(pmid);
-                                } else {
-                                    pubmedItem = converter.createItem("Publication");
-                                    pubmedIdMap.put(pmid, pubmedItem);
-                                    pubmedItem.setAttribute("pubMedId", pmid);
-                                    addItem(pubmedItem);
-                                }
-                                addPublication(pubmedItem);
-                            } else if (ref.startsWith("UniProt:")) {
-                                String uniprotAcc = ref.substring(colonIndex + 1);
-
-                                Item proteinItem;
-                                if (protIdMap.containsKey(uniprotAcc)) {
-                                    proteinItem = protIdMap.get(uniprotAcc);
-                                } else {
-                                    proteinItem = converter.createItem("Protein");
-                                    proteinItem.setAttribute("primaryAccession", uniprotAcc);
-                                    proteinItem.setReference("organism", getOrganism());
-                                    addItem(proteinItem);
-
-                                    protIdMap.put(uniprotAcc, proteinItem);
-                                }
-                                feature.setReference("protein", proteinItem);
-                            } else {
-                                throw new RuntimeException("unknown external reference type: " + ref);
-                            }
-                        }
-                    }
+                // This is gene alias
+                if (record.getAttributes().get("symbol") != null) {
+                    String symbol = record.getAttributes().get("symbol").iterator().next();
+                    feature.setAttribute("symbol", symbol);
                 }
-
                 break;
             case "exon":
             case "CDS":
