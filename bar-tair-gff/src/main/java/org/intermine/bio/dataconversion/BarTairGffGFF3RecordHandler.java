@@ -124,21 +124,21 @@ public class BarTairGffGFF3RecordHandler extends GFF3RecordHandler
                                 addItem(pubmedItem);
                             }
                             addPublication(pubmedItem);
-                        } else if (ref.startsWith("UniProt:")) {
-                            String uniprotAcc = ref.substring(colonIndex + 1);
+			} else if (ref.startsWith("UniProt:")) {
+                        //    String uniprotAcc = ref.substring(colonIndex + 1);
 
-                            Item proteinItem;
-                            if (protIdMap.containsKey(uniprotAcc)) {
-                                proteinItem = protIdMap.get(uniprotAcc);
-                            } else {
-                                proteinItem = converter.createItem("Protein");
-                                proteinItem.setAttribute("primaryAccession", uniprotAcc);
-                                proteinItem.setReference("organism", getOrganism());
-                                addItem(proteinItem);
+                        //    Item proteinItem;
+                        //    if (protIdMap.containsKey(uniprotAcc)) {
+                        //        proteinItem = protIdMap.get(uniprotAcc);
+                        //    } else {
+                        //        proteinItem = converter.createItem("Protein");
+                        //        proteinItem.setAttribute("primaryAccession", uniprotAcc);
+                        //        proteinItem.setReference("organism", getOrganism());
+                        //        addItem(proteinItem);
 
-                                protIdMap.put(uniprotAcc, proteinItem);
-                            }
-                            feature.setReference("protein", proteinItem);
+                        //        protIdMap.put(uniprotAcc, proteinItem);
+                        //    }
+                        //    feature.setReference("protein", proteinItem);
                         } else {
                             throw new RuntimeException("unknown external reference type: " + ref);
                         }
