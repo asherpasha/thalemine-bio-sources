@@ -3,8 +3,12 @@ rootProject.name = 'bio-sources'
 include ':bio-source-bar-ncbi-fasta'
 project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-ncbi-fasta')
 
-include ':bio-source-bar-ncbi-gff'
-project(':bio-source-bar-ncbi-gff').projectDir = new File(settingsDir, './bar-ncbi-gff')
+//include ':bio-source-bar-ncbi-gff'
+//project(':bio-source-bar-ncbi-gff').projectDir = new File(settingsDir, './bar-ncbi-gff')
 
 include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
+
+// This does not work the way it used to
+//include ':uniprot'
+//project(':uniprot').projectDir = new File(settingsDir, './uniprot')
