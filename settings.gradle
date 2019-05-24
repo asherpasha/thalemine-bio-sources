@@ -9,6 +9,3 @@ project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-
 include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
 
-// This does not work the way it used to
-//include ':uniprot'
-//project(':uniprot').projectDir = new File(settingsDir, './uniprot')
