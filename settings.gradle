@@ -11,3 +11,6 @@ project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-ta
 
 include ':bio-source-go-annotation'
 project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
+
+include ':bio-source-uniprot'
+project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
