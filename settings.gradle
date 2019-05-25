@@ -9,3 +9,5 @@ project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-
 include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
 
+include ':bio-source-go-annotation'
+project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
