@@ -1,0 +1,130 @@
+[Term]
+id: PO:0000001
+name: embryo proper
+namespace: plant_anatomy
+def: "An embryonic plant structure that is the body of a developing plant embryo attached to the maternal tissue in an ovule by a suspensor." [POC:Ramona_Walls]
+comment: The embryo proper is the entire embryo exclusive of the suspensor.
+synonym: "embri&#243foro (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "胚本体 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+xref: OBO_SF_PO:3132560
+is_a: PO:0025099 ! embryo plant structure
+relationship: part_of PO:0009009 ! plant embryo
+
+[Term]
+id: PO:0000002
+name: anther wall
+namespace: plant_anatomy
+alt_id: PO:0006445
+alt_id: PO:0006477
+def: "A microsporangium wall that is part of an anther." [ISBN:0471244554, ISBN:9780003686647]
+comment: Has an outer epidermis (exothecium) and an endothecium and may have additional layers. If you are annotating to this structure for Zea mays or other grasses, please also add an annotation to the corresponding floret type. Choose the most specific term possible from: spikelet floret (PO:0009082), tassel floret (PO:0006310), lower floret of pedicellate spikelet of tassel (PO:0006313), lower floret of sessile spikelet of tassel (PO:0006315), upper floret of pedicellate spikelet of tassel (PO:0006314), upper floret of sessile spikelet of tassel (PO:0006316).
+subset: Angiosperm
+subset: reference
+synonym: "pared de la antera (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "Poaceae anther wall" NARROW []
+synonym: "pollen sac wall" EXACT []
+synonym: "Zea anther wall" NARROW []
+synonym: "葯壁 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+is_a: PO:0025307 ! microsporangium wall
+relationship: part_of PO:0009066 ! anther
+
+[Term]
+id: PO:0000003
+name: whole plant
+namespace: plant_anatomy
+def: "A plant structure (PO:0005679) which is a whole organism." [POC:curators]
+comment: Examples include plant embryo (PO:0009009), megagametophyte (PO:0025279) and microgametophyte (PO:0025280).
+subset: reference
+subset: TraitNet
+synonym: "bush" NARROW []
+synonym: "clonal colony" RELATED []
+synonym: "colony" RELATED []
+synonym: "frutex" NARROW [FNA:e4dde193-57f7-4ab9-9d25-96b4ca0088ba]
+synonym: "frutices" NARROW Plural [FNA:ec8c2064-2a67-43d7-8e14-aecfef5cf33b]
+synonym: "gametophyte" NARROW []
+synonym: "genet" BROAD []
+synonym: "herb" NARROW []
+synonym: "liana" NARROW []
+synonym: "planta entera (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "prothalli" NARROW Plural [FNA:4b610104-1bb0-4c6b-9bb9-e3cc61d11ac0]
+synonym: "prothallium" NARROW []
+synonym: "prothallus" NARROW [FNA:f8f31520-e4bc-4430-9274-8dd3cee7ffd8]
+synonym: "ramet" BROAD []
+synonym: "seedling" NARROW []
+synonym: "shrub" NARROW []
+synonym: "sporophyte" NARROW []
+synonym: "suffrutex" NARROW [FNA:99508f62-7116-4e2b-90c0-19ff55ebd967]
+synonym: "suffrutices" NARROW Plural [FNA:ba1b1bd5-75bd-4195-b11c-3aba08da08c2]
+synonym: "tree" NARROW []
+synonym: "vine" NARROW []
+synonym: "woody clump" NARROW [FNA:c1ccca7d-2a98-4a9d-8603-c34b551935e0]
+synonym: "植物体全体 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+xref: OBO_SF_PO:2968335
+xref: OBO_SF_PO:3612743
+is_a: PO:0009011 ! plant structure
+
+[Term]
+id: PO:0000004
+name: in vitro plant structure
+namespace: plant_anatomy
+def: "A plant structure (PO:0009011) that is grown or maintained in vitro." [POC:curators]
+comment: In vitro growth is defined as microbe-free growth in a sterile, culture environment, usually in the laboratory. An example of a sterile culture environment is growth on or in a nutrient medium in a Petri dish, culture flask or test tube. Microbes may be intentionally added to the culture environment, such as in co-culture with Agrobacterium.
+synonym: "estructura vegetal in vito (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "培養下植物構造 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+xref: OBO_SF_PO:2958948
+is_a: PO:0009011 ! plant structure
+
+[Term]
+id: PO:0000005
+name: cultured plant cell
+namespace: plant_anatomy
+def: "A plant cell that is grown or maintained in vitro." [POC:curators]
+comment: Includes isolated plant cells and small plant cell aggregates that proliferate while suspended in sterile liquid medium or spread on a solid agar medium.
+subset: CL
+synonym: "c&#233lula cultivada (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "cell suspension" RELATED []
+synonym: "cultured cell" BROAD []
+synonym: "培養植物細胞 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+xref: OBO_SF_PO:3289997
+is_a: PO:0000004 ! in vitro plant structure
+is_a: PO:0009002 ! plant cell
+
+[Term]
+id: PO:0000006
+name: plant protoplast
+namespace: plant_anatomy
+def: "A cultured plant cell from which the entire plant cell wall has been removed." [POC:curators]
+comment: The cell wall is generally removed using polysaccharide-degrading enzymes such as cellulase, pectinase and /or xylanase. The cultured plant cell may be in suspension culture or from callus culture on solid media.
+subset: CL
+synonym: "protoplast" BROAD []
+synonym: "protoplasto cultivado (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "植物プロトプラスト (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+xref: OBO_SF_PO:3279819
+is_a: PO:0000005 ! cultured plant cell
+
+[Term]
+id: PO:0000007
+name: leaf-derived cultured plant cell
+namespace: plant_anatomy
+def: "A cultured plant cell that was derived from leaf tissue." [POC:curators]
+comment: May be derived from cultured plant callus or plant protoplast that was induced from a segment of leaf. In the case of the plant protoplast, after the re-establishment cell walls.
+subset: CL
+synonym: "c&#233lula cultivada de hoja (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "cultured plant cell" RELATED [POC:curators]
+synonym: "leaf-derived cultured cell" EXACT []
+synonym: "葉由来植物培養細胞 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+is_a: PO:0000005 ! cultured plant cell
+relationship: derives_by_manipulation_from PO:0025034 ! leaf
+
+[Term]
+id: PO:0000008
+name: root-derived cultured plant cell
+namespace: plant_anatomy
+def: "A cultured plant cell that was derived from root tissue." [POC:curators]
+comment: May be derived from cultured plant callus or plant protoplasts induced from a segment of root. In the case of the plant protoplast, after the re-establishment plant cell walls.
+subset: CL
+synonym: "c&#233lula cultivada de ra&#237z (Spanish)" EXACT Spanish [POC:Maria_Alejandra_Gandolfo]
+synonym: "root-derived cultured cell" EXACT []
+synonym: "根由来植物培養細胞 (Japanese)" EXACT Japanese [NIG:Yukiko_Yamazaki]
+is_a: PO:0000005 ! cultured plant cell
+relationship: derives_by_manipulation_from PO:0009005 ! root

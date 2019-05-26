@@ -1,0 +1,10 @@
+!type: % is_a is a
+!type: < part_of part of
+!type: ^ inverse_of inverse of
+!type: | disjoint_from disjoint from
+$Plant_Ontology ; PO:0003673
+ <molecular_function ; PO:0003674
+ <AP-2 adaptor complex ; PO:0030122 ; synonym:HA2 % clathrin adaptor complex ; PO:0030131 < clathrin coat of coated pit ; PO:0030132
+ <vesicle coating ; PO:0006901 ; synonym:vesicle coat assembly
+  %oxygen binding ; PO:0019825 ; synonym:cytochrome P450
+  %steroid hydroxylase activity ; PO:0008395
