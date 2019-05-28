@@ -11,6 +11,7 @@ include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
 
 // This is mostly from upstream Intermine
+// Only ath changes added
 include ':bio-source-go-annotation'
 project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
 
@@ -25,3 +26,11 @@ project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
 //project(':bio-source-po').projectDir = new File(settingsDir, './po')
 //include ':bio-source-po-annotation'
 //project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
+
+// Only ath changes added
+include ':bio-source-biogrid'
+project(':bio-source-biogrid').projectDir = new File(settingsDir, './biogrid')
+
+// Only ath changes added
+include ':bio-source-psi'
+project(':bio-source-psi').projectDir = new File(settingsDir, './psi')
