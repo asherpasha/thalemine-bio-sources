@@ -28,9 +28,11 @@ project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
 //project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
 
 // Only ath changes added
+// Skip ID resolver
 include ':bio-source-biogrid'
 project(':bio-source-biogrid').projectDir = new File(settingsDir, './biogrid')
 
 // Only ath changes added
+// Skip ID resolver. Make ID upper case
 include ':bio-source-psi'
 project(':bio-source-psi').projectDir = new File(settingsDir, './psi')

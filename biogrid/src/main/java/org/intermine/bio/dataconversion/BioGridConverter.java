@@ -124,9 +124,11 @@ public class BioGridConverter extends BioFileConverter
             }
         }
 
-        if (rslv == null) {
-            rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
-        }
+	// ThaleMine
+        //if (rslv == null) {
+        //    rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
+        //}
+	rslv = null;
 
         BioGridHandler handler = new BioGridHandler();
         try {

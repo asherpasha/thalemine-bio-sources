@@ -61,7 +61,8 @@ public class PsiConverter extends BioFileConverter
     private Set<String> taxonIds = null;
     private Map<String, String> genes = new HashMap<String, String>();
     private Map<MultiKey, Item> interactions = new HashMap<MultiKey, Item>();
-    private static final String ALIAS_TYPE = "gene name";
+    // ThaleMine Alias Type
+    private static final String ALIAS_TYPE = "locus name";
     private static final String SPOKE_MODEL = "prey";   // don't store if all roles prey
     private static final String DEFAULT_IDENTIFIER = "symbol";
     private static final String DEFAULT_DATASOURCE = "";
@@ -105,9 +106,11 @@ public class PsiConverter extends BioFileConverter
     public void process(Reader reader) throws Exception {
 
         // init reslover
-        if (rslv == null) {
-            rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
-        }
+	// Thalemine
+        //if (rslv == null) {
+        //    rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
+        //}
+	rslv = null;
 
         PsiHandler handler = new PsiHandler();
         try {
@@ -691,7 +694,8 @@ public class PsiConverter extends BioFileConverter
                 return identifier;
             }
 
-            return id;
+            // ThaleMine IDs should be uppercase
+	    return id.toUpperCase();
         }
 
         private String storeGene(String field, String identifier, String taxonId)
