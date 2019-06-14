@@ -36,3 +36,6 @@ project(':bio-source-biogrid').projectDir = new File(settingsDir, './biogrid')
 // Skip ID resolver. Make ID upper case
 include ':bio-source-psi'
 project(':bio-source-psi').projectDir = new File(settingsDir, './psi')
+
+include ':bio-source-generif'
+project(':bio-source-generif').projectDir = new File(settingsDir, './generif')

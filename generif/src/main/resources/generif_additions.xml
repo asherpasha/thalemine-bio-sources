@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- This file details any extensions needed to the data model to store data from this source, everything else is automatically generated from the model description so this is all we need to do to add to the model. -->
+
+<classes>
+<!-- add any <class> elements here -->
+<class name="Gene" is-interface="true">
+ <collection name="geneRifs" referenced-type="Generif" reverse-reference="gene"/>
+</class>
+
+<class name="Generif" is-interface="true">
+ <attribute name="annotation" type="java.lang.String" />
+ <attribute name="timeStamp" type="java.util.Date" />
+ <reference name="gene" referenced-type="Gene" reverse-reference="geneRifs" />
+ <reference name="publication" referenced-type="Publication" />
+ <reference name="organism" referenced-type="Organism" />
+</class>
+
+</classes>
