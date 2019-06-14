@@ -37,5 +37,11 @@ project(':bio-source-biogrid').projectDir = new File(settingsDir, './biogrid')
 include ':bio-source-psi'
 project(':bio-source-psi').projectDir = new File(settingsDir, './psi')
 
+// ID resolver cant be skipped 
+// Overwrite resolved IDs
 include ':bio-source-generif'
 project(':bio-source-generif').projectDir = new File(settingsDir, './generif')
+
+// ID resolver skipped
+include ':bio-source-pubmed-gene'
+project(':bio-source-pubmed-gene').projectDir = new File(settingsDir, './pubmed-gene')
