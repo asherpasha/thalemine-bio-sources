@@ -1,7 +1,7 @@
 package org.intermine.bio.dataconversion;
 
 /*
- * Copyright (C) 2002-2019 FlyMine
+ * Copyright (C) 2002-2015 FlyMine
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -11,17 +11,12 @@ package org.intermine.bio.dataconversion;
  */
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,27 +28,25 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.intermine.dataconversion.ItemWriter;
 import org.intermine.metadata.Model;
-import org.intermine.metadata.StringUtil;
-import org.intermine.metadata.TypeUtil;
 import org.intermine.model.bio.BioEntity;
 import org.intermine.objectstore.ObjectStoreException;
-import org.intermine.util.FormattedTextParser;
 import org.intermine.util.PropertiesUtil;
+import org.intermine.metadata.StringUtil;
+import org.intermine.metadata.TypeUtil;
 import org.intermine.xml.full.Item;
 import org.intermine.xml.full.ReferenceList;
 
 /**
- * DataConverter to parse a po annotation file into Items.
+ * DataConverter to parse a go annotation file into Items.
  * *
  * @author Andrew Varley
- * @author Peter Mclaren - some additions to record the parents of a po term.
+ * @author Peter Mclaren - some additions to record the parents of a go term.
  * @author Julie Sullivan - updated to handle GAF 2.0
  * @author Xavier Watkins - refactored model
  */
 public class PoConverter extends BioFileConverter
 {
     protected static final String PROP_FILE = "po-annotation_config.properties";
-    protected static final String EVIDENCE_CODES_FILE = "po-evidence-codes";
 
     // configuration maps
     private Map<String, Config> configs = new HashMap<String, Config>();
@@ -62,10 +55,11 @@ public class PoConverter extends BioFileConverter
     // maps retained across all files
     protected Map<String, String> poTerms = new LinkedHashMap<String, String>();
     private Map<String, String> evidenceCodes = new LinkedHashMap<String, String>();
+    private Map<String, String> dataSets = new LinkedHashMap<String, String>();
     private Map<String, String> publications = new LinkedHashMap<String, String>();
+    private Map<String, String> xrefPub = new LinkedHashMap<String, String>();
     private Map<String, Item> organisms = new LinkedHashMap<String, Item>();
     protected Map<String, String> productMap = new LinkedHashMap<String, String>();
-    private Set<String> dbRefs = new HashSet<String>();
     @SuppressWarnings("unused")
     private Map<String, String> databaseAbbreviations = new HashMap<String, String>();
 
@@ -79,14 +73,13 @@ public class PoConverter extends BioFileConverter
     protected String termClassName = "POTerm";
     protected String termCollectionName = "poAnnotation";
     protected String annotationClassName = "POAnnotation";
+    private String gaff = "2.0";
     private static final String DEFAULT_ANNOTATION_TYPE = "gene";
     private static final String DEFAULT_IDENTIFIER_FIELD = "primaryIdentifier";
     protected IdResolver rslv;
     private static Config defaultConfig = null;
-    private String datasource, dataset, licence;
-    private String datasetRefId = null;
+
     private static final Logger LOG = Logger.getLogger(PoConverter.class);
-    private static final String PO_ANNOTATION_NAME = "PO Annotation";
 
     /**
      * Constructor
@@ -100,65 +93,17 @@ public class PoConverter extends BioFileConverter
         defaultConfig = new Config(DEFAULT_IDENTIFIER_FIELD, DEFAULT_IDENTIFIER_FIELD,
                 DEFAULT_ANNOTATION_TYPE);
         readConfig();
-        loadEvidenceCodes();
-        datasetRefId = setDefaultDataset();
-
     }
 
     /**
-     * Set the licence, a URL to the licence for this ontology
+     * Sets the file format for the GAF.  2.0 is the default.
      *
-     * @param licence licence for these data. Expects a URL
+     * @param gaff GO annotation file format
      */
-    public void setLicence(String licence) {
-        this.licence = licence;
+    public void setGaff(String gaff) {
+        this.gaff = gaff;
     }
 
-    /**
-     * Set the data set for this ontology
-     *
-     * @param dataset data set for this ontology
-     */
-    public void setDataset(String dataset) {
-        this.dataset = dataset;
-    }
-
-    /**
-     * Set the data source for this ontology -- an organisation
-     *
-     * @param datasource the organisation responsible for this ontology
-     */
-    public void setDatasource(String datasource) {
-        this.datasource = datasource;
-    }
-
-    private String setDefaultDataset() throws ObjectStoreException {
-        if (datasource == null) {
-            datasource = PO_ANNOTATION_NAME;
-        }
-
-        if (dataset == null) {
-            dataset = PO_ANNOTATION_NAME + " data set";
-        }
-
-        String datasourceRefId = getDataSource(datasource);
-
-        return getDataSet(dataset, datasourceRefId, licence);
-    }
-
-    private void storeDataset() throws ObjectStoreException {
-        if (datasource == null) {
-            datasource = PO_ANNOTATION_NAME;
-        }
-
-        if (dataset == null) {
-            dataset = PO_ANNOTATION_NAME + " data set";
-        }
-
-        String datasourceRefId = getDataSource(datasource);
-
-        getDataSet(dataset, datasourceRefId, licence);
-    }
 
     static {
         WITH_TYPES.put("FB", "Gene");
@@ -234,32 +179,10 @@ public class PoConverter extends BioFileConverter
                 LOG.info("Unable to find annotationType property for " + "taxon: " + taxonId
                         + " in file: " + PROP_FILE + ".  Creating genes by default.");
             }
-
             Config config = new Config(identifier, readColumn, annotationType);
             configs.put(taxonId, config);
         }
     }
-
-    private void loadEvidenceCodes() throws URISyntaxException, FileNotFoundException,
-        IOException, ObjectStoreException {
-        InputStream is = getClass().getClassLoader().getResourceAsStream(EVIDENCE_CODES_FILE);
-        Iterator<String[]> lineIter = FormattedTextParser
-                .parseTabDelimitedReader(new InputStreamReader(is));
-        while (lineIter.hasNext()) {
-            String[] line = (String[]) lineIter.next();
-            String code = line[0];
-            String name = line[1];
-            String url = line[2];
-
-            Item item = createItem("POEvidenceCode");
-            item.setAttribute("code", code);
-            item.setAttribute("name", name);
-            item.setAttribute("url", url);
-            evidenceCodes.put(code, item.getIdentifier());
-            store(item);
-        }
-    }
-
 
     /**
      * {@inheritDoc}
@@ -271,8 +194,6 @@ public class PoConverter extends BioFileConverter
         if (rslv == null) {
             rslv = IdResolverService.getIdResolverForMOD();
         }
-
-        storeDataset();
 
         initialiseMapsForFile();
 
@@ -305,50 +226,65 @@ public class PoConverter extends BioFileConverter
             String qualifier = array[3];
             String strEvidence = array[6];
             String withText = array[7];
+
+            // LOG.info("PO annotation summary for " + goId + ": " + qualifier  + "-" + withText + "=" + productId);
+
             String annotationExtension = null;
             if (array.length >= 16) {
                 annotationExtension = array[15];
             }
+
+            // to add dbref like TAIR:Communication:501714663
+            // only ath, i think
+            if (!array[5].contains("PMID") && taxonId.equalsIgnoreCase("3702")) {
+                annotationExtension = array[5];
+            }
+
             if (StringUtils.isNotEmpty(strEvidence)) {
-                if (!evidenceCodes.containsKey(strEvidence)) {
-                    throw new IllegalArgumentException("Evidence code is `" + strEvidence
-                            + "' which is not in the legal list of evidence codes. Oh no! "
-                            + "Is it new? Add to /resources/po-evidence-codes and try again. And "
-                            + "let InterMiners know so they can update the file too");
-                }
+                storeEvidenceCode(strEvidence);
             } else {
                 throw new IllegalArgumentException("Evidence is a required column but not "
                         + "found for poterm " + poId + " and productId " + productId);
             }
 
             String type = config.annotationType;
+            if ("1.0".equals(gaff)) {
+                // type of gene product
+                type = array[11];
+            }
+
+            if (productId.startsWith("gene:")) {
+                type = "mrna";
+            }
 
             // create unique key for po annotation
-            PoTermToGene key = new PoTermToGene(productId, poId, qualifier, withText);
+            PoTermToGene key = new PoTermToGene(productId, poId, qualifier);
 
-//            String dataSourceCode = array[14]; // e.g. GDB, where uniprot collect the data from
-//            String dataSource = array[0]; // e.g. UniProtKB, where the poa file comes from
+            String dataSourceCode = array[14]; // e.g. GDB, where uniprot collect the data from
+            String dataSource = array[0]; // e.g. UniProtKB, where the goa file comes from
             Item organism = newOrganism(taxonId);
-            String productIdentifier = newProduct(productId, type, organism, true, null);
+            String productIdentifier = newProduct(productId, type, organism,
+                    dataSource, dataSourceCode, true, null);
 
             // null if resolver could not resolve an identifier
             if (productIdentifier != null) {
-
                 // null if no pub found
                 String pubRefId = newPublication(array[5]);
-
-                // get evidence codes for this poterm|gene pair
+                // get evidence codes for this goterm|gene pair
                 Set<Evidence> allEvidenceForAnnotation = poTermGeneToEvidence.get(key);
 
                 // new evidence
                 if (allEvidenceForAnnotation == null || !StringUtils.isEmpty(withText)) {
-                    String poTermIdentifier = newPoTerm(poId);
-                    Evidence evidence = new Evidence(strEvidence, pubRefId, withText, organism);
+                    String goTermIdentifier = newPoTerm(poId, dataSource, dataSourceCode);
+                    Evidence evidence = new Evidence(strEvidence, pubRefId, withText, organism,
+                            dataSource, dataSourceCode);
                     allEvidenceForAnnotation = new LinkedHashSet<Evidence>();
                     allEvidenceForAnnotation.add(evidence);
                     poTermGeneToEvidence.put(key, allEvidenceForAnnotation);
+
                     Integer storedAnnotationId = createPoAnnotation(productIdentifier, type,
-                            poTermIdentifier, qualifier, annotationExtension);
+                            goTermIdentifier, organism, qualifier, dataSource, dataSourceCode,
+                            annotationExtension);
                     evidence.setStoredAnnotationId(storedAnnotationId);
                 } else {
                     boolean seenEvidenceCode = false;
@@ -364,7 +300,8 @@ public class PoConverter extends BioFileConverter
                         }
                     }
                     if (!seenEvidenceCode) {
-                        Evidence evidence = new Evidence(strEvidence, pubRefId, withText, organism);
+                        Evidence evidence = new Evidence(strEvidence, pubRefId, withText, organism,
+                                dataSource, dataSourceCode);
                         evidence.storedAnnotationId = storedAnnotationId;
                         allEvidenceForAnnotation.add(evidence);
                     }
@@ -408,7 +345,8 @@ public class PoConverter extends BioFileConverter
                 // with objects
                 if (!StringUtils.isEmpty(evidence.withText)) {
                     poevidence.setAttribute("withText", evidence.withText);
-                    List<String> with = createWithObjects(evidence.withText, evidence.organism);
+                    List<String> with = createWithObjects(evidence.withText, evidence.organism,
+                            evidence.dataSource, evidence.dataSourceCode);
                     if (!with.isEmpty()) {
                         poevidence.addCollection(new ReferenceList("with", with));
                     }
@@ -426,12 +364,14 @@ public class PoConverter extends BioFileConverter
     }
 
     private Integer createPoAnnotation(String productIdentifier, String productType,
-            String termIdentifier, String qualifier, String annotationExtension)
-            throws ObjectStoreException {
+            String termIdentifier, Item organism, String qualifier, String dataSource,
+            String dataSourceCode, String annotationExtension) throws ObjectStoreException {
+
+//LOG.info("CREATEPOANN " + productIdentifier + "-" + productType);
+
         Item poAnnotation = createItem(annotationClassName);
         poAnnotation.setReference("subject", productIdentifier);
         poAnnotation.setReference("ontologyTerm", termIdentifier);
-        poAnnotation.addToCollection("dataSets", datasetRefId);
 
         if (!StringUtils.isEmpty(qualifier)) {
             poAnnotation.setAttribute("qualifier", qualifier);
@@ -440,10 +380,10 @@ public class PoConverter extends BioFileConverter
             poAnnotation.setAttribute("annotationExtension", annotationExtension);
         }
 
+        poAnnotation.addToCollection("dataSets", getDataset(dataSource, dataSourceCode));
         if ("gene".equals(productType)) {
             addProductCollection(productIdentifier, poAnnotation.getIdentifier());
         }
-
         Integer storedAnnotationId = store(poAnnotation);
         return storedAnnotationId;
     }
@@ -464,11 +404,13 @@ public class PoConverter extends BioFileConverter
      *
      * @param withText string from the gene_association entry
      * @param organism organism to reference
+     * @param dataSource the name of goa file source
+     * @param dataSourceCode short code to describe data source
      * @throws ObjectStoreException if problem when storing
      * @return a list of Items
      */
-    protected List<String> createWithObjects(String withText, Item organism)
-            throws ObjectStoreException {
+    protected List<String> createWithObjects(String withText, Item organism,
+            String dataSource, String dataSourceCode) throws ObjectStoreException {
 
         List<String> withProductList = new ArrayList<String>();
         try {
@@ -488,22 +430,24 @@ public class PoConverter extends BioFileConverter
                         // also FlyBase may be from a different Drosophila species
                         if ("UniProt".equals(prefix)) {
                             productIdentifier = newProduct(value, className,
-                                    organism, false, null);
+                                    organism, dataSource, dataSourceCode,
+                                    false, null);
                         } else if ("FB".equals(prefix)) {
                             // if organism is D. melanogaster then create with gene
-                            // TODO could still be wrong as the FBgn could be a different species
+                            // TODO rm
                             if ("7227".equals(organism.getAttribute("taxonId").getValue())) {
                                 productIdentifier = newProduct(value, className, organism,
-                                        true, "primaryIdentifier");
+                                        dataSource, dataSourceCode, true, "primaryIdentifier");
                             }
                         } else {
-                            productIdentifier = newProduct(value, className, organism, true, null);
+                            productIdentifier = newProduct(value, className, organism,
+                                    dataSource, dataSourceCode, true, null);
                         }
                         if (productIdentifier != null) {
                             withProductList.add(productIdentifier);
                         }
                     } else {
-                        LOG.debug("createWithObjects skipping a withType prefix:" + prefix);
+                        LOG.info("createWithObjects skipping a withType prefix:" + prefix);
                     }
                 }
             }
@@ -514,7 +458,8 @@ public class PoConverter extends BioFileConverter
         return withProductList;
     }
 
-    private String newProduct(String identifier, String type, Item organism, boolean createOrganism,
+    private String newProduct(String identifier, String type, Item organism,
+            String dataSource, String dataSourceCode, boolean createOrganism,
             String field) throws ObjectStoreException {
         String idField = field;
         String accession = identifier;
@@ -535,7 +480,7 @@ public class PoConverter extends BioFileConverter
                 }
             }
 
-            if (rslv != null && rslv.hasTaxon(taxonId)) {
+            if (rslv != null && rslv.hasTaxon(taxonId) && !"3702".equals(taxonId)) {
                 if ("10116".equals(taxonId)) { // RGD doesn't have prefix in its annotation data
                     accession = "RGD:" + accession;
                 }
@@ -553,6 +498,10 @@ public class PoConverter extends BioFileConverter
             // TODO use values in config
             clsName = "Protein";
             idField = "primaryAccession";
+        } else if ("mrna".equalsIgnoreCase(type)) {
+            // TODO use values in config
+            clsName = "MRNA";
+            idField = "secondaryIdentifier";
         } else {
             String typeCls = TypeUtil.javaiseClassName(type);
 
@@ -565,6 +514,21 @@ public class PoConverter extends BioFileConverter
             if (clsName == null) {
                 throw new IllegalArgumentException("Unrecognised annotation type '" + type + "'");
             }
+
+            // if (idField == null) {
+            //     Config config = configs.get(taxonId);
+            //     if (config == null) {
+            //         config = defaultConfig;
+            //     }
+            //     idField = config.identifier;
+            //     if (idField == null) {
+            //         throw new RuntimeException("Could not find a identifier property for taxon: "
+            //                 + taxonId + " check properties file: " + PROP_FILE);
+            //     }
+            // }
+
+
+
         }
 
         boolean includeOrganism;
@@ -588,7 +552,9 @@ public class PoConverter extends BioFileConverter
             product.setReference("organism", organism.getIdentifier());
         }
         product.setAttribute(idField, accession);
-        product.addToCollection("dataSets", datasetRefId);
+
+        String dataSetIdentifier = getDataset(dataSource, dataSourceCode);
+        product.addToCollection("dataSets", dataSetIdentifier);
 
         Integer storedProductId = store(product);
         storedProductIds.put(product.getIdentifier(), storedProductId);
@@ -610,7 +576,26 @@ public class PoConverter extends BioFileConverter
                 ? organism.getIdentifier() : "");
     }
 
-    private String newPoTerm(String identifier) throws ObjectStoreException {
+//    private String resolveTerm(String identifier) {
+//        String goId = identifier;
+//        if (rslv != null) {
+//            int resCount = rslv.countResolutions("0", identifier);
+//
+//            if (resCount > 1) {
+//                LOG.info("RESOLVER: failed to resolve ontology term to one identifier, "
+//                        + "ignoring term: " + identifier + " count: " + resCount + " : "
+//                        + rslv.resolveId("0", identifier));
+//                return null;
+//            }
+//            if (resCount == 1) {
+//                goId = rslv.resolveId("0", identifier).iterator().next();
+//            }
+//        }
+//        return goId;
+//    }
+
+    private String newPoTerm(String identifier, String dataSource,
+            String dataSourceCode) throws ObjectStoreException {
         if (identifier == null) {
             return null;
         }
@@ -619,7 +604,7 @@ public class PoConverter extends BioFileConverter
         if (poTermIdentifier == null) {
             Item item = createItem(termClassName);
             item.setAttribute("identifier", identifier);
-            item.addToCollection("dataSets", datasetRefId);
+            item.addToCollection("dataSets", getDataset(dataSource, dataSourceCode));
             store(item);
 
             poTermIdentifier = item.getIdentifier();
@@ -628,6 +613,14 @@ public class PoConverter extends BioFileConverter
         return poTermIdentifier;
     }
 
+    private void storeEvidenceCode(String code) throws ObjectStoreException {
+        if (evidenceCodes.get(code) == null) {
+            Item item = createItem("POEvidenceCode");
+            item.setAttribute("code", code);
+            evidenceCodes.put(code, item.getIdentifier());
+            store(item);
+        }
+    }
 
     private String getDataSourceCodeName(String sourceCode) {
         String title = sourceCode;
@@ -645,7 +638,7 @@ public class PoConverter extends BioFileConverter
             title = "GeneDB";
         } else if ("SANGER".equalsIgnoreCase(sourceCode)) {
             title = "GeneDB";
-        } else if ("POA".equalsIgnoreCase(sourceCode)) {
+        } else if ("GOA".equalsIgnoreCase(sourceCode)) {
             title = "Gene Ontology";
         } else if ("PINC".equalsIgnoreCase(sourceCode)) {
             title = "Proteome Inc.";
@@ -654,6 +647,23 @@ public class PoConverter extends BioFileConverter
         }
         return title;
     }
+
+    private String getDataset(String dataSource, String code)
+        throws ObjectStoreException {
+        String dataSetIdentifier = dataSets.get(code);
+        if (dataSetIdentifier == null) {
+            String dataSourceName = getDataSourceCodeName(code);
+            String title = "PO Annotation from " + dataSourceName;
+            Item item = createItem("DataSet");
+            item.setAttribute("name", title);
+            item.setReference("dataSource", getDataSource(getDataSourceCodeName(dataSource)));
+            dataSetIdentifier = item.getIdentifier();
+            dataSets.put(code, dataSetIdentifier);
+            store(item);
+        }
+        return dataSetIdentifier;
+    }
+
 
     private String newPublication(String codes) throws ObjectStoreException {
         String pubRefId = null;
@@ -670,55 +680,73 @@ public class PoConverter extends BioFileConverter
                         item.setAttribute("pubMedId", pubMedId);
                         pubRefId = item.getIdentifier();
                         publications.put(pubMedId, pubRefId);
-
                     }
                 }
             } else {
                 xrefs.add(array[i]);
             }
         }
-        ReferenceList refIds = new ReferenceList("crossReferences");
-
         // PMID may be first or last so we can't process xrefs until we've looked at all IDs
         if (StringUtils.isNotEmpty(pubRefId)) {
-            for (String xref : xrefs) {
-                refIds.addRefId(createDbReference(xref));
-            }
+            createXrefs(pubRefId, xrefs);
         }
         if (item != null) {
-            item.addCollection(refIds);
             store(item);
         }
+        LOG.debug("pubrefid: " + pubRefId);
         return pubRefId;
     }
 
-    private String createDbReference(String value)
-        throws ObjectStoreException {
-        if (StringUtils.isEmpty(value)) {
-            return null;
-        }
-        String sourceName = null;
-        if (!dbRefs.contains(value)) {
-            Item item = createItem("DatabaseReference");
+/**
+     * @param pubRefId
+     * @param xrefs
+     * @throws ObjectStoreException
+     */
+    private void createXrefs(String pubRefId, Set<String> xrefs) throws ObjectStoreException {
+        for (String xref : xrefs) {
+
+            String dataSource = null;
             // FB:FBrf0055969
-            if (value.contains(":")) {
-                String[] bits = value.split(":");
+            if (xref.contains(":")) {
+                String[] bits = xref.split(":");
                 if (bits.length == 2) {
                     String db = bits[0];
-                    sourceName = getDataSourceCodeName(db);
-                    value = bits[1];
+                    dataSource = getDataSourceCodeName(db);
+                    xref = bits[1];
+                }
+                if (bits.length == 3) {
+                    // for TAIR reference like
+                    // TAIR:Publication:501682431
+                    String db = bits[0];
+                    dataSource = getDataSourceCodeName(db);
+                    xref = bits[1] + ":" + bits[2];
                 }
             }
-            item.setAttribute("identifier", value);
-            if (StringUtils.isNotEmpty(sourceName)) {
-                item.setReference("source", getDataSource(sourceName));
+            // create dbxref only if does not exist yet
+            if (!xrefPub.containsKey(xref)) {
+                createDbxrefItem(pubRefId, xref, dataSource);
+                xrefPub.put(xref, pubRefId);
             }
-            dbRefs.add(value);
-            store(item);
-            return item.getIdentifier();
         }
-        return null;
     }
+
+/**
+ * @param pubRefId
+ * @param xref
+ * @param dataSource
+ * @throws ObjectStoreException
+ */
+    private void createDbxrefItem(String pubRefId, String xref, String dataSource)
+            throws ObjectStoreException {
+        Item item = createItem("DatabaseReference");
+        item.setAttribute("identifier", xref);
+        if (StringUtils.isNotEmpty(dataSource)) {
+            item.setReference("source", getDataSource(dataSource));
+        }
+        item.setReference("subject", pubRefId);
+        store(item);
+    }
+
 
     private Item newOrganism(String taxonId) throws ObjectStoreException {
         Item item = organisms.get(taxonId);
@@ -749,14 +777,19 @@ public class PoConverter extends BioFileConverter
         private Integer storedAnnotationId = null;
         private String withText = null;
         private Item organism = null;
+        private String dataSourceCode = null;
+        private String dataSource = null;
+
 
         //dataSource, dataSourceCode
 
         protected Evidence(String evidenceCode, String publicationRefId, String withText,
-                Item organism) {
+                Item organism, String dataset, String datasource) {
             this.evidenceCode = evidenceCode;
             this.withText = withText;
             this.organism = organism;
+            this.dataSourceCode = dataset;
+            this.dataSource = datasource;
             addPublicationRefId(publicationRefId);
         }
 
@@ -767,7 +800,6 @@ public class PoConverter extends BioFileConverter
         }
 
         protected List<String> getPublications() {
-
             return publicationRefIds;
         }
 
@@ -778,6 +810,16 @@ public class PoConverter extends BioFileConverter
         @SuppressWarnings("unused")
         protected String getWithText() {
             return withText;
+        }
+
+        @SuppressWarnings("unused")
+        protected String getDataset() {
+            return dataSourceCode;
+        }
+
+        @SuppressWarnings("unused")
+        protected String getDatasource() {
+            return dataSource;
         }
 
         @SuppressWarnings("unused")
@@ -803,7 +845,7 @@ public class PoConverter extends BioFileConverter
 
 
     /**
-     * Identify a PoTerm/geneProduct pair with qualifier
+     * Identify a GoTerm/geneProduct pair with qualifier
      * used to also use evidence code
      */
     private class PoTermToGene
@@ -811,7 +853,6 @@ public class PoConverter extends BioFileConverter
         private String productId;
         private String poId;
         private String qualifier;
-        private String withText;
 
         /**
          * Constructor
@@ -820,11 +861,10 @@ public class PoConverter extends BioFileConverter
          * @param poId      PO term id
          * @param qualifier qualifier
          */
-        PoTermToGene(String productId, String poId, String qualifier, String withText) {
+        PoTermToGene(String productId, String poId, String qualifier) {
             this.productId = productId;
             this.poId = poId;
             this.qualifier = qualifier;
-            this.withText = withText;
         }
 
         /**
@@ -836,8 +876,7 @@ public class PoConverter extends BioFileConverter
                 PoTermToGene po = (PoTermToGene) o;
                 return productId.equals(po.productId)
                         && poId.equals(po.poId)
-                        && qualifier.equals(po.qualifier)
-                        && withText.equals(po.withText);
+                        && qualifier.equals(po.qualifier);
             }
             return false;
         }
@@ -849,8 +888,7 @@ public class PoConverter extends BioFileConverter
         public int hashCode() {
             return ((3 * productId.hashCode())
                     + (5 * poId.hashCode())
-                    + (7 * qualifier.hashCode())
-                    + (11 * withText.hashCode()));
+                    + (7 * qualifier.hashCode()));
         }
 
         /**
@@ -866,8 +904,7 @@ public class PoConverter extends BioFileConverter
             toStringBuff.append(poId);
             toStringBuff.append(" qualifier:");
             toStringBuff.append(qualifier);
-            toStringBuff.append(" withText:");
-            toStringBuff.append(withText);
+
             return toStringBuff.toString();
         }
     }

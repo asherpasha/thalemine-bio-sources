@@ -20,12 +20,11 @@ project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-an
 include ':bio-source-uniprot'
 project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
 
-// This source does not work. Do not use!
 // We may have to rewrite this based on go 
-//include ':bio-source-po'
-//project(':bio-source-po').projectDir = new File(settingsDir, './po')
-//include ':bio-source-po-annotation'
-//project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
+include ':bio-source-po'
+project(':bio-source-po').projectDir = new File(settingsDir, './po')
+include ':bio-source-po-annotation'
+project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
 
 // Only ath changes added
 // Skip ID resolver
