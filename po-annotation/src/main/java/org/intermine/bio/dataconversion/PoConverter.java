@@ -271,6 +271,8 @@ public class PoConverter extends BioFileConverter
         if (rslv == null) {
             rslv = IdResolverService.getIdResolverForMOD();
         }
+        // Resolver not working!
+        rslv = null;
 
         storeDataset();
 
@@ -347,8 +349,7 @@ public class PoConverter extends BioFileConverter
                     allEvidenceForAnnotation = new LinkedHashSet<Evidence>();
                     allEvidenceForAnnotation.add(evidence);
                     poTermGeneToEvidence.put(key, allEvidenceForAnnotation);
-                    Integer storedAnnotationId = createPoAnnotation(productIdentifier, type,
-                            poTermIdentifier, qualifier, annotationExtension);
+                    Integer storedAnnotationId = createPoAnnotation(productIdentifier, type, poTermIdentifier, qualifier, annotationExtension);
                     evidence.setStoredAnnotationId(storedAnnotationId);
                 } else {
                     boolean seenEvidenceCode = false;
@@ -535,7 +536,7 @@ public class PoConverter extends BioFileConverter
                 }
             }
 
-            if (rslv != null && rslv.hasTaxon(taxonId)) {
+            if (rslv != null && rslv.hasTaxon(taxonId) && !"3702".equals(taxonId)) {
                 if ("10116".equals(taxonId)) { // RGD doesn't have prefix in its annotation data
                     accession = "RGD:" + accession;
                 }
@@ -645,8 +646,10 @@ public class PoConverter extends BioFileConverter
             title = "GeneDB";
         } else if ("SANGER".equalsIgnoreCase(sourceCode)) {
             title = "GeneDB";
-        } else if ("POA".equalsIgnoreCase(sourceCode)) {
+        } else if ("GOA".equalsIgnoreCase(sourceCode)) {
             title = "Gene Ontology";
+        } else if ("POA".equalsIgnoreCase(sourceCode)) {
+            title = "Plant Ontology";
         } else if ("PINC".equalsIgnoreCase(sourceCode)) {
             title = "Proteome Inc.";
         } else if ("Pfam".equalsIgnoreCase(sourceCode)) {
@@ -707,6 +710,13 @@ public class PoConverter extends BioFileConverter
                     String db = bits[0];
                     sourceName = getDataSourceCodeName(db);
                     value = bits[1];
+                }
+                if (bits.length == 3) {
+                    // for TAIR reference like
+                    // TAIR:Publication:501682431
+                    String db = bits[0];
+                    sourceName = getDataSourceCodeName(db);
+                    value = bits[1] + ":" + bits[2];
                 }
             }
             item.setAttribute("identifier", value);
