@@ -26,6 +26,9 @@ project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
 //include ':bio-source-po-annotation'
 //project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
 
+//include ':bio-source-salk-tdnaseq-gff'
+//project(':bio-source-salk-tdnaseq-gff').projectDir = new File(settingsDir, './salk-tdnaseq-gff')
+
 // Only ath changes added
 // Skip ID resolver
 include ':bio-source-biogrid'
