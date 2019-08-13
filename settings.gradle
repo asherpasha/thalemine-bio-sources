@@ -47,3 +47,7 @@ project(':bio-source-generif').projectDir = new File(settingsDir, './generif')
 // ID resolver skipped
 include ':bio-source-pubmed-gene'
 project(':bio-source-pubmed-gene').projectDir = new File(settingsDir, './pubmed-gene')
+
+// Panther resolver skipped
+include ':bio-source-panther'
+project(':bio-source-panther').projectDir = new File(settingsDir, './panther')
