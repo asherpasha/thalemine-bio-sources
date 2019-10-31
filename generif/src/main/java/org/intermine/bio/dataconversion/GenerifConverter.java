@@ -141,7 +141,7 @@ public class GenerifConverter extends BioFileConverter
 
             pid = athResolver.resolveId(taxid, geneId).iterator().next();
             // Asher: For now just go set pid = geneId. Delete the following line after Intermine pull request
-            pid = geneId;
+            // pid = geneId;
 
             LOG.info("READING " + taxid + ": " + pid + "<->" + geneId + "|" + pubMedId + "|"
                     + timeStamp + "--" + annotation);
