@@ -3,9 +3,6 @@ rootProject.name = 'bio-sources'
 include ':bio-source-bar-ncbi-fasta'
 project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-ncbi-fasta')
 
-//include ':bio-source-bar-ncbi-gff'
-//project(':bio-source-bar-ncbi-gff').projectDir = new File(settingsDir, './bar-ncbi-gff')
-
 // This is also mostly from Araport
 include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
@@ -19,15 +16,6 @@ project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-an
 // This needs update to Intermine v4.
 include ':bio-source-uniprot'
 project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
-
-// We may have to rewrite this based on go 
-//include ':bio-source-po'
-//project(':bio-source-po').projectDir = new File(settingsDir, './po')
-//include ':bio-source-po-annotation'
-//project(':bio-source-po-annotation').projectDir = new File(settingsDir, './po-annotation')
-
-//include ':bio-source-salk-tdnaseq-gff'
-//project(':bio-source-salk-tdnaseq-gff').projectDir = new File(settingsDir, './salk-tdnaseq-gff')
 
 // Only ath changes added
 // Skip ID resolver
@@ -44,10 +32,4 @@ project(':bio-source-psi').projectDir = new File(settingsDir, './psi')
 include ':bio-source-generif'
 project(':bio-source-generif').projectDir = new File(settingsDir, './generif')
 
-// ID resolver skipped
-include ':bio-source-pubmed-gene'
-project(':bio-source-pubmed-gene').projectDir = new File(settingsDir, './pubmed-gene')
 
-// Panther resolver skipped
-include ':bio-source-panther'
-project(':bio-source-panther').projectDir = new File(settingsDir, './panther')

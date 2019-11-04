@@ -61,13 +61,13 @@ public class PsiConverter extends BioFileConverter
     private Set<String> taxonIds = null;
     private Map<String, String> genes = new HashMap<String, String>();
     private Map<MultiKey, Item> interactions = new HashMap<MultiKey, Item>();
-    // ThaleMine Alias Type
-    private static final String ALIAS_TYPE = "locus name";
+    private static String ALIAS_TYPE = "gene name";
     private static final String SPOKE_MODEL = "prey";   // don't store if all roles prey
     private static final String DEFAULT_IDENTIFIER = "symbol";
     private static final String DEFAULT_DATASOURCE = "";
     private static final String BINDING_SITE = "MI:0117";
     private static final Set<String> INTERESTING_COMMENTS = new HashSet<String>();
+    private static final String ATH_TAXONID = "3702";  // A. thaliana taxon ID. (ThaleMine)
 
     protected IdResolver rslv;
 
@@ -105,12 +105,15 @@ public class PsiConverter extends BioFileConverter
     @Override
     public void process(Reader reader) throws Exception {
 
-        // init reslover
-	// Thalemine
-        //if (rslv == null) {
-        //    rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
-        //}
-	rslv = null;
+        // A. thaliana does not use ID resolver, and the alias type is locus name.
+        if (taxonIds.size() == 1 && taxonIds.contains(ATH_TAXONID)) {
+            ALIAS_TYPE = "locus name";
+        } else {
+            // init reslover
+            if (rslv == null) {
+                rslv = IdResolverService.getIdResolverByOrganism(taxonIds);
+            }
+        }
 
         PsiHandler handler = new PsiHandler();
         try {
@@ -694,8 +697,12 @@ public class PsiConverter extends BioFileConverter
                 return identifier;
             }
 
-            // ThaleMine IDs should be uppercase
-	    return id.toUpperCase();
+            // If this is A. thaliana, make ids uppercase. 
+            if (taxonId.equals(ATH_TAXONID)) {
+                return id.toUpperCase();
+            }
+
+            return id;
         }
 
         private String storeGene(String field, String identifier, String taxonId)
