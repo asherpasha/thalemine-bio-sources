@@ -22,3 +22,5 @@ include ':bio-source-bar-generif'
 project(':bio-source-bar-generif').projectDir = new File(settingsDir, './bar-generif')
 
 
+include ':bio-source-bar-tair-functional-descriptions'
+project(':bio-source-bar-tair-functional-descriptions').projectDir = new File(settingsDir, './bar-tair-functional-descriptions')
