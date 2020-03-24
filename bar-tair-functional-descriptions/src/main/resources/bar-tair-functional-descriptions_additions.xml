@@ -1,7 +1,17 @@
 <?xml version="1.0"?>
-<!-- This file details any extensions needed to the data model to store data from this source, everything else is automatically generated from the model description so this is all we need to do to add to the model. -->
+<!-- Author: Asher -->
+<!-- Date: March, 2020 -->
 
 <classes>
-<!-- add any <class> elements here -->
+    <class name="Gene" is-interface="true">
+        <collection name="tair" referenced-type="TAIR" reverse-reference="gene"/>
+    </class>
+
+    <!-- TAIR data object -->
+    <class name="TAIR" is-interface="true">
+        <attribute name="shortDescription" type="java.lang.String" />
+        <attribute name="curatorSummary" type="java.lang.String" />
+        <attribute name="computationalDescription" type="java.lang.String" />
+    </class>
 
 </classes>
