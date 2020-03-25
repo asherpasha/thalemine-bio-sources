@@ -114,9 +114,18 @@ public class BarTairFunctionalDescriptionsConverter extends BioFileConverter
      */
     private Item createTAIRDescription(String shortDescription, String curatorSummary, String computationalDescription) {
         Item tair = createItem("TAIR");
-        tair.setAttribute("shortDescription", shortDescription);
-        tair.setAttribute("curatorSummary", curatorSummary);
-        tair.setAttribute("computationalDescription", computationalDescription);
+
+        if (shortDescription != null && !shortDescription.isEmpty()) {
+            tair.setAttribute("shortDescription", shortDescription);
+        }
+
+        if (curatorSummary != null && !curatorSummary.isEmpty()) {
+            tair.setAttribute("curatorSummary", curatorSummary);
+        }
+
+        if (computationalDescription != null && !computationalDescription.isEmpty()) {
+            tair.setAttribute("computationalDescription", computationalDescription);
+        }
 
         return tair;
     }
