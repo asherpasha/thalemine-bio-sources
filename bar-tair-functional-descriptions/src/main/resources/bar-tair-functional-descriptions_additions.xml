@@ -4,15 +4,8 @@
 
 <classes>
     <class name="Gene" is-interface="true">
-        <collection name="tair" referenced-type="TAIR" reverse-reference="gene"/>
+        <attribute name="tairShortDescription" type="java.lang.String" />
+        <attribute name="tairCuratorSummary" type="java.lang.String" />
+        <attribute name="tairComputationalDescription" type="java.lang.String" />
     </class>
-
-    <!-- TAIR data object -->
-    <class name="TAIR" is-interface="true">
-        <attribute name="shortDescription" type="java.lang.String" />
-        <attribute name="curatorSummary" type="java.lang.String" />
-        <attribute name="computationalDescription" type="java.lang.String" />
-        <reference name="gene" referenced-type="Gene" reverse-reference="tair" />
-    </class>
-
 </classes>

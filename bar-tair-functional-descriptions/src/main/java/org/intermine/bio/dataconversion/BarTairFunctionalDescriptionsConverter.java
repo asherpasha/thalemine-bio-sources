@@ -91,13 +91,8 @@ public class BarTairFunctionalDescriptionsConverter extends BioFileConverter
                     continue;
                 }
 
-                // Now create TAIR annotation Object
-                Item tair = createTAIRDescription(shortDescription, curatorSummary, computationalDescription);
-                // Create Gene if it doesn't exists
-                createBioEntity(geneId);
-                // Make the db relation
-                tair.setReference("gene", geneItems.get(geneId));
-                store(tair);
+                // Create and store data if it doesn't exists
+                createBioEntity(geneId, shortDescription, curatorSummary, computationalDescription);
             }
         } else {
             System.err.println("The file: " + currentFile.getName() + " can not be loaded by this loader!");
@@ -105,46 +100,38 @@ public class BarTairFunctionalDescriptionsConverter extends BioFileConverter
     }
 
     /**
-     * Create the data object.
-     *
-     * @param shortDescription TAIR short description
-     * @param curatorSummary TAIR curator summary
-     * @param computationalDescription TAIR computational Description.
-     * @return data object
-     */
-    private Item createTAIRDescription(String shortDescription, String curatorSummary, String computationalDescription) {
-        Item tair = createItem("TAIR");
-
-        if (shortDescription != null && !shortDescription.isEmpty()) {
-            tair.setAttribute("shortDescription", shortDescription);
-        }
-
-        if (curatorSummary != null && !curatorSummary.isEmpty()) {
-            tair.setAttribute("curatorSummary", curatorSummary);
-        }
-
-        if (computationalDescription != null && !computationalDescription.isEmpty()) {
-            tair.setAttribute("computationalDescription", computationalDescription);
-        }
-
-        return tair;
-    }
-
-    /**
      * Create and store a BioEntity item on the first time called.
      *
-     * @param primaryId the primaryIdentifier
-     * @throws ObjectStoreException Object Store error
+     * @param primaryId Gene ID like AT1G01010
+     * @param tairShortDescription TAIR short description
+     * @param tairCuratorSummary TAIR curator summary
+     * @param tairComputationalDescription TAIR computational description
+     * @throws ObjectStoreException Data store error
      */
-    private void createBioEntity(String primaryId) throws ObjectStoreException {
+    private void createBioEntity(String primaryId, String tairShortDescription, String tairCuratorSummary, String tairComputationalDescription) throws ObjectStoreException {
         // doing only genes here
-        Item bioentity;
+        Item bioEntity;
 
         if (!geneItems.containsKey(primaryId)) {
-            bioentity = createItem("Gene");
-            bioentity.setAttribute("primaryIdentifier", primaryId);
-            store(bioentity);
-            geneItems.put(primaryId, bioentity.getIdentifier());
+            // Create a Gene if it does not exist. So one TAIR data per gene
+            bioEntity = createItem("Gene");
+            bioEntity.setAttribute("primaryIdentifier", primaryId);
+
+            // Now add TAIR data
+            if (tairShortDescription != null && !tairShortDescription.isEmpty()) {
+                bioEntity.setAttribute("tairShortDescription", tairShortDescription);
+            }
+
+            if (tairCuratorSummary != null && !tairCuratorSummary.isEmpty()) {
+                bioEntity.setAttribute("tairCuratorSummary", tairCuratorSummary);
+            }
+
+            if (tairComputationalDescription != null && !tairComputationalDescription.isEmpty()) {
+                bioEntity.setAttribute("tairComputationalDescription", tairComputationalDescription);
+            }
+
+            store(bioEntity);
+            geneItems.put(primaryId, bioEntity.getIdentifier());
         }
     }
 }
