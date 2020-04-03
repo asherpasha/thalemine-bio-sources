@@ -17,9 +17,7 @@ import org.intermine.xml.full.Item;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static org.intermine.util.FormattedTextParser.parseTabDelimitedReader;
 
@@ -66,7 +64,9 @@ public class BarTairAliasesConverter extends BioFileConverter
             // Just a variable to skip the header
             boolean firstLine = true;
             String currentGene = "";
+            // Store gene aliases
             String geneAlias = "";
+            List<String> aliases = new ArrayList<>();
 
             assert tsvIter != null;
             while (tsvIter.hasNext()) {
@@ -95,17 +95,27 @@ public class BarTairAliasesConverter extends BioFileConverter
                 if (currentGene.isEmpty()) {
                     // New Gene, So create one
                     currentGene = geneId;
-                    geneAlias = symbol;
+                    aliases.add(symbol);
                 } else if (currentGene.equals(geneId)) {
                     // The Gene is already seen. So append gene alias
-                    geneAlias = geneAlias.concat(", " + symbol);
+                    // Also, check if alias is present. (Example: See ABI3 gene data)
+                    if (!aliases.contains(symbol)) {
+                        aliases.add(symbol);
+                    }
                 } else {
                     // The Gene has changed. First save the old data, then save the now data
+                    if (aliases.isEmpty()) {
+                        geneAlias = "";
+                    } else {
+                        geneAlias = String.join(", ", aliases);
+                    }
+                    aliases.clear();
+
                     createBioEntity(currentGene, geneAlias);
 
                     // Creating new data
                     currentGene = geneId;
-                    geneAlias = symbol;
+                    aliases.add(symbol);
                 }
             }
         } else {
