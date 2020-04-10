@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- Author: Asher -->
+<!-- Date: March, 2020 -->
+
+<classes>
+    <class name="Gene" is-interface="true">
+        <attribute name="tairShortDescription" type="java.lang.String" />
+        <attribute name="tairCuratorSummary" type="java.lang.String" />
+        <attribute name="tairComputationalDescription" type="java.lang.String" />
+    </class>
+</classes>
