@@ -1,7 +1,7 @@
 package org.intermine.bio.dataconversion;
 
 /*
- * Copyright (C) 2002-2019 FlyMine
+ * Copyright (C) 2002-2020 FlyMine
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -50,9 +50,9 @@ import org.intermine.xml.full.ReferenceList;
  * @author Julie Sullivan - updated to handle GAF 2.0
  * @author Xavier Watkins - refactored model
  */
-public class BarGoConverter extends BioFileConverter
+public class GoConverter extends BioFileConverter
 {
-    protected static final String PROP_FILE = "bar-go-annotation_config.properties";
+    protected static final String PROP_FILE = "go-annotation_config.properties";
     protected static final String EVIDENCE_CODES_FILE = "go-evidence-codes";
 
     // configuration maps
@@ -85,7 +85,7 @@ public class BarGoConverter extends BioFileConverter
     private static Config defaultConfig = null;
     private String datasource, dataset, licence;
     private String datasetRefId = null;
-    private static final Logger LOG = Logger.getLogger(BarGoConverter.class);
+    private static final Logger LOG = Logger.getLogger(GoConverter.class);
     private static final String GO_ANNOTATION_NAME = "GO Annotation";
 
     /**
@@ -95,7 +95,7 @@ public class BarGoConverter extends BioFileConverter
      * @param model the Model
      * @throws Exception if an error occurs in storing or finding Model
      */
-    public BarGoConverter(ItemWriter writer, Model model) throws Exception {
+    public GoConverter(ItemWriter writer, Model model) throws Exception {
         super(writer, model);
         defaultConfig = new Config(DEFAULT_IDENTIFIER_FIELD, DEFAULT_IDENTIFIER_FIELD,
                 DEFAULT_ANNOTATION_TYPE);

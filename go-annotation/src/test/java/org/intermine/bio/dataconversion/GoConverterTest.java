@@ -1,7 +1,7 @@
 package org.intermine.bio.dataconversion;
 
 /*
- * Copyright (C) 2002-2019 FlyMine
+ * Copyright (C) 2002-2020 FlyMine
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -26,14 +26,14 @@ import org.intermine.xml.full.Item;
 import org.intermine.xml.full.ItemFactory;
 
 
-public class BarGoConverterTest extends ItemsTestCase
+public class GoConverterTest extends ItemsTestCase
 {
     private File goOboFile;
     Model model;
-    BarGoConverter converter;
+    GoConverter converter;
     MockItemWriter writer;
 
-    public BarGoConverterTest(String arg) {
+    public GoConverterTest(String arg) {
         super(arg);
     }
 
@@ -44,7 +44,7 @@ public class BarGoConverterTest extends ItemsTestCase
             getClass().getClassLoader().getResourceAsStream("go-tiny.obo"));
         writeTempFile(goOboFile, goOboReader);
         writer = new MockItemWriter(new LinkedHashMap<String, org.intermine.model.fulldata.Item>());
-        converter = new BarGoConverter(writer, model);
+        converter = new GoConverter(writer, model);
         converter.setLicence("https://creativecommons.org/licenses/by/4.0/legalcode");
 
         converter.rslv = IdResolverService.getMockIdResolver("Gene");

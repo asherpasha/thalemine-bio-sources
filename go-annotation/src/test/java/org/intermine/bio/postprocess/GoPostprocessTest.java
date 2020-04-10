@@ -1,7 +1,7 @@
 package org.intermine.bio.postprocess;
 
 /*
- * Copyright (C) 2002-2019 FlyMine
+ * Copyright (C) 2002-2020 FlyMine
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -38,9 +38,9 @@ import org.intermine.objectstore.query.SingletonResults;
 import org.intermine.util.DynamicUtil;
 
 /**
- * Tests for the BarGoPostprocess class.
+ * Tests for the GoPostprocess class.
  */
-public class BarGoPostprocessTest extends XMLTestCase {
+public class GoPostprocessTest extends XMLTestCase {
 
     private ObjectStoreWriter osw;
 
@@ -75,7 +75,7 @@ public class BarGoPostprocessTest extends XMLTestCase {
     public void testPostProcess() throws Exception {
         deleteAlltheThings();
         setUpData();
-        BarGoPostprocess gp = new BarGoPostprocess(osw);
+        GoPostprocess gp = new GoPostprocess(osw);
         gp.postProcess();
 
         Set<InterMineObject> genes = getFromDb(Gene.class);
@@ -96,7 +96,7 @@ public class BarGoPostprocessTest extends XMLTestCase {
     public void testMerging() throws Exception {
         setUpDuplicateData();
 
-        BarGoPostprocess gp = new BarGoPostprocess(osw);
+        GoPostprocess gp = new GoPostprocess(osw);
         gp.postProcess();
 
         Gene resGene = (Gene) getFromDb(Gene.class).iterator().next();

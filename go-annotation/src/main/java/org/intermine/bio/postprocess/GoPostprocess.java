@@ -1,7 +1,7 @@
 package org.intermine.bio.postprocess;
 
 /*
- * Copyright (C) 2002-2019 FlyMine
+ * Copyright (C) 2002-2020 FlyMine
  *
  * This code may be freely distributed and modified under the
  * terms of the GNU Lesser General Public Licence.  This should
@@ -48,16 +48,16 @@ import org.intermine.postprocess.PostProcessor;
  * @author Richard Smith
  * @author julie sullivan
  */
-public class BarGoPostprocess extends PostProcessor
+public class GoPostprocess extends PostProcessor
 {
-    private static final Logger LOG = Logger.getLogger(BarGoPostprocess.class);
+    private static final Logger LOG = Logger.getLogger(GoPostprocess.class);
     protected ObjectStore os;
 
     /**
      * Create a new UpdateOrthologes object from an ObjectStoreWriter
      * @param osw writer on genomic ObjectStore
      */
-    public BarGoPostprocess(ObjectStoreWriter osw) {
+    public GoPostprocess(ObjectStoreWriter osw) {
         super(osw);
         this.os = osw.getObjectStore();
     }
