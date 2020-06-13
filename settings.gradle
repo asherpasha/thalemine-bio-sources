@@ -7,11 +7,6 @@ project(':bio-source-bar-ncbi-fasta').projectDir = new File(settingsDir, './bar-
 include ':bio-source-bar-tair-gff'
 project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-tair-gff')
 
-// This is mostly from upstream Intermine
-// This might not work upstream
-include ':bio-source-go-annotation'
-project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
-
 // This is from Araport fork of Intermine.
 include ':bio-source-uniprot'
 project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
