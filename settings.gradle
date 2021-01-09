@@ -11,8 +11,6 @@ project(':bio-source-bar-tair-gff').projectDir = new File(settingsDir, './bar-ta
 include ':bio-source-uniprot'
 project(':bio-source-uniprot').projectDir = new File(settingsDir, './uniprot')
 
-// ID resolver cant be skipped 
-// Overwrite resolved IDs
 include ':bio-source-bar-generif'
 project(':bio-source-bar-generif').projectDir = new File(settingsDir, './bar-generif')
 
