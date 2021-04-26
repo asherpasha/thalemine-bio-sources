@@ -3,7 +3,10 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.Copy
 buildscript {
     repositories {
         mavenLocal()
-	mavenCentral()
+	jcenter()
+	maven {
+            url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
+        }
     }
     dependencies {
         classpath group: 'org.intermine', name: 'plugin', version: System.getProperty("imVersion")
@@ -20,19 +23,22 @@ ext {
 
 subprojects {
     group = 'org.intermine'
-    version = '5.0.0'
+    version = '4.2.0'
 
     apply plugin: 'java'
     apply plugin: 'maven'
     apply plugin: 'dbmodel'
     apply plugin: 'biosource-dbmodel'
-
+ 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
     repositories {
         mavenLocal()
-	mavenCentral()
+	jcenter()
+	maven {
+            url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
+        }
     }
 
     configurations {
