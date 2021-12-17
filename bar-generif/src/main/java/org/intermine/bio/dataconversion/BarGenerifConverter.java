@@ -67,8 +67,6 @@ public class BarGenerifConverter extends BioFileConverter
             processFile(reader, org);
         } else {
             LOG.info("WWSS skipping file: " + currentFile.getName());
-            //            throw new IllegalArgumentException("Unexpected file: "
-            //          + currentFile.getName());
         }
     }
 
