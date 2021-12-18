@@ -3,6 +3,7 @@ import com.sun.org.apache.xalan.internal.xsltc.compiler.Copy
 buildscript {
     repositories {
         mavenLocal()
+	mavenCentral()
         jcenter()
         maven {
             url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
@@ -10,8 +11,8 @@ buildscript {
     }
     dependencies {
         classpath group: 'org.intermine', name: 'plugin', version: System.getProperty("imVersion")
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
+        classpath group: 'com.jfrog.bintray.gradle', name: 'gradle-bintray-plugin', version: '1.8.5'
+        classpath group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.25.2'
     }
 }
 
@@ -23,7 +24,7 @@ ext {
 
 subprojects {
     group = 'org.intermine'
-    version = '4.3.0'
+    version = '5.0.4'
 
     apply plugin: 'java'
     apply plugin: 'maven'
@@ -35,6 +36,7 @@ subprojects {
 
     repositories {
         mavenLocal()
+	mavenCentral()
         jcenter()
         maven {
             url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
@@ -47,8 +49,8 @@ subprojects {
     }
 
     dependencies {
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.16.0'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
         compile group: 'org.intermine', name: 'bio-core', version: System.getProperty("bioVersion"), transitive: false
         compile group : "org.intermine", name: "intermine-resources", version: System.getProperty("imVersion") // log4j
         compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
