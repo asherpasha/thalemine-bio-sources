@@ -11,7 +11,6 @@ package org.intermine.bio.dataconversion;
  */
 
 
-import org.apache.log4j.Logger;
 import org.biojava.nbio.core.sequence.DNASequence;
 import org.biojava.nbio.core.sequence.template.Sequence;
 
@@ -22,8 +21,6 @@ import org.biojava.nbio.core.sequence.template.Sequence;
  */
 public class BarNcbiFastaLoaderTask extends FastaLoaderTask
 {
-    protected static final Logger LOG = Logger.getLogger(BarNcbiFastaLoaderTask.class);
-
     /**
      * {@inheritDoc}
      */
