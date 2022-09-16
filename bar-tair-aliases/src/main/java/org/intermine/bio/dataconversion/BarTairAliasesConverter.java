@@ -80,9 +80,19 @@ public class BarTairAliasesConverter extends BioFileConverter
                 // Now start reading the lines.
                 String[] line = (String[]) tsvIter.next();
 
-                // Get data: short_description	Curator_summary	Computational_description
+                // Check length
+                if (line.length < 2) {
+                    continue;
+                }
+
+                // Get data: short_description    Curator_summary    Computational_description
                 String geneId = line[0];
                 String symbol = line[1];
+
+                // NULLs
+                if (symbol == "NULL") {
+                    symbol = "";
+                }
 
                 // Now check if Gene Id is in the form of AT1G01010.1.
                 // It would start with AT, and is 9 characters long (Avoiding regex for speed).

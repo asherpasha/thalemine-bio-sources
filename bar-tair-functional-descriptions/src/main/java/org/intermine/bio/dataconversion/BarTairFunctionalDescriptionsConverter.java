@@ -77,11 +77,30 @@ public class BarTairFunctionalDescriptionsConverter extends BioFileConverter
                 // Now start reading the lines.
                 String[] line = (String[]) tsvIter.next();
 
+                // Check length
+                if (line.length < 5) {
+                    continue;
+                }
+
+
                 // Get data: short_description	Curator_summary	Computational_description
                 String geneId = line[0];
                 String shortDescription = line[2];
                 String curatorSummary = line[3];
                 String computationalDescription = line[4];
+
+                // NULLs
+                if (shortDescription == "NULL") {
+                    shortDescription = "";
+                }
+
+                if (curatorSummary == "NULL") {
+                    curatorSummary = "";
+                }
+
+                if (computationalDescription == "NULL") {
+                    computationalDescription = "";
+                }
 
                 // Now check if Gene Id is in the form of AT1G01010.1.
                 // It would start with AT, end with .1 and is 11 characters long (Avoiding regex for speed).
