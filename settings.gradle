@@ -17,6 +17,8 @@ project(':bio-source-bar-generif').projectDir = new File(settingsDir, './bar-gen
 include ':bio-source-bar-tair-functional-descriptions'
 project(':bio-source-bar-tair-functional-descriptions').projectDir = new File(settingsDir, './bar-tair-functional-descriptions')
 
+include ':bio-source-go-annotation'
+project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
+
 include ':bio-source-bar-tair-aliases'
 project(':bio-source-bar-tair-aliases').projectDir = new File(settingsDir, './bar-tair-aliases')
-
