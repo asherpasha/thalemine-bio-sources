@@ -20,5 +20,8 @@ project(':bio-source-bar-tair-functional-descriptions').projectDir = new File(se
 include ':bio-source-go-annotation'
 project(':bio-source-go-annotation').projectDir = new File(settingsDir, './go-annotation')
 
+include ':bio-source-protein2ipr'
+project(':bio-source-protein2ipr').projectDir = new File(settingsDir, './protein2ipr')
+
 include ':bio-source-bar-tair-aliases'
 project(':bio-source-bar-tair-aliases').projectDir = new File(settingsDir, './bar-tair-aliases')
