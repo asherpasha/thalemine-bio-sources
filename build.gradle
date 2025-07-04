@@ -6,7 +6,7 @@ buildscript {
 	mavenCentral()
         jcenter()
         maven {
-            url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
+            url "https://repo.grails.org/grails/core/"
         }
     }
     dependencies {
@@ -39,7 +39,7 @@ subprojects {
 	mavenCentral()
         jcenter()
         maven {
-            url "https://oss.jfrog.org/artifactory/oss-snapshot-local"
+            url "https://repo.grails.org/grails/core/"
         }
     }
 
